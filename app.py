@@ -1,5 +1,5 @@
 from datetime import datetime
-from io import BytesIO
+from io import StringIO, BytesIO
 from flask import Flask, request, jsonify, render_template, send_file
 from flask_sqlalchemy import SQLAlchemy
 import csv
@@ -110,7 +110,7 @@ def delete_entry(entry_id):
 def export_csv():
     try:
         expenses = Expense.query.all()
-        output = BytesIO()
+        output = StringIO()
         writer = csv.writer(output)
         writer.writerow(['ID', 'Amount', 'Description', 'Category', 'Type', 'Date'])
 
@@ -119,7 +119,7 @@ def export_csv():
 
         output.seek(0)
         return send_file(
-            output,
+            BytesIO(output.getvalue().encode()),
             mimetype='text/csv',
             as_attachment=True,
             download_name='expenses.csv'
